@@ -1,6 +1,7 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import env from 'react-dotenv';
 
 import useInfiniteScroll from '../../app/useInfiniteScroll';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -67,7 +68,10 @@ const Viewer = () => {
   const [copied, setCopied] = useState(false);
   const [hasTreeView, setTreeView] = useState(true);
   const [loadMore, setLoadMore] = useState(false);
-  const [localTokenData, setLocalTokenData] = useLocalStorageState('cd083eddf5f84423a8fa4fad42c5f999', {});
+
+  // TODO - harden
+  const [localTokenData, setLocalTokenData] = useLocalStorageState(env.APP_ID, {});
+
   const [selectedContentId, setSelectedContentId] = useState('');
   const [keywords, setKeywords] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
