@@ -28,6 +28,7 @@ function App() {
           <Route element={<RouteListenerLayout />}>
             <Route element={<OAuth2Popup />} path="/callback" />
             <Route element={<Login />} path="/" />
+            <Route element={<Login />} path="/login" />
             <Route element={<Viewer />} path="/view" />
           </Route>
         </Routes>

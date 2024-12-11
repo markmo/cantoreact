@@ -1,10 +1,12 @@
 import { KeyboardEvent, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useLocalStorageState from 'use-local-storage-state';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import env from 'react-dotenv';
 
 import useInfiniteScroll from '../../app/useInfiniteScroll';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import useOAuth2 from '../Login/useOAuth2';
 import {
   toggleSubtreeAsync,
   getDetailAsync,
@@ -15,6 +17,7 @@ import {
   loadTreeAsync,
   selectDetail,
   selectImageList,
+  selectIsLoggedIn,
   selectLoadedAll,
   selectLoading,
   selectPreviewImages,
@@ -59,11 +62,13 @@ const Viewer = () => {
   const detailData = useAppSelector(selectDetail);
   const previewImages = useAppSelector(selectPreviewImages);
   const imageList = useAppSelector(selectImageList);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const loadedAll = useAppSelector(selectLoadedAll);
   const loading = useAppSelector(selectLoading);
   const tokenData = useAppSelector(selectTokenData);
   const tree = useAppSelector(selectTree);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [copied, setCopied] = useState(false);
   const [hasTreeView, setTreeView] = useState(true);
@@ -80,6 +85,14 @@ const Viewer = () => {
   const detail = detailData[selectedContentId];
 
   const { loadMoreRef, reachedEnd } = useInfiniteScroll();
+
+  const { getAuth } = useOAuth2({
+    navigate,
+    appId: env.APP_ID,
+    authorizeUrl: env.AUTHORIZE_URL,
+    redirectUrl: `${document.location.origin}/callback`,
+    tokenUrl: `/api/token`,
+  });
 
   useEffect(() => {
     dispatch(initializeTokenData(localTokenData));
@@ -166,6 +179,13 @@ const Viewer = () => {
     }));
   };
 
+  const logout = () => {
+    setLocalTokenData({});
+    setTimeout(() => {
+      navigate('/login');
+    }, 20);
+  };
+
   return (
     <>
       <div className="header-section">
@@ -216,7 +236,9 @@ const Viewer = () => {
           ></span>
         </div>
         <div id="selectedCountSection" className="selected-count-section hidden"><span id="selected-count">2</span><span> File(s) Selected</span></div>
-        <div className="logout-btn" id="logoutBtn" title="Logout">
+        <div className="logout-btn" id="logoutBtn" title={isLoggedIn ? 'Logout' : 'Login'}
+          onClick={() => isLoggedIn ? logout() : getAuth()}
+        >
           <span className="icon-s-logoout-24"></span>
         </div>
         <div id="selectedActionSection" className="selected-action-section hidden">

@@ -439,4 +439,6 @@ export const selectTokenData = (state: RootState) => state.viewer.tokenData;
 
 export const selectTree = (state: RootState) => state.viewer.tree;
 
+export const selectIsLoggedIn = (state: RootState) => !!state.viewer.tokenData?.accessToken;
+
 export default viewerSlice.reducer;
